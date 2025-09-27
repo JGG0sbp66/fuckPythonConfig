@@ -14,6 +14,10 @@ class ConfigReadError(Exception):
     def _format_message(self) -> str:
         return f"{self.message} (file_path: {self.file_path})"
 
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
+        cls.__module__ = "builtins"
+
 
 class FileNotFoundError(ConfigReadError):
     pass

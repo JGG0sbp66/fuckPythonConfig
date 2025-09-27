@@ -2,6 +2,9 @@
 import os
 import re
 import tomllib
+from typing import IO
+
+from dotenv import load_dotenv
 
 from .exceptions import FileNotFoundError, TOMLReadError
 
@@ -20,6 +23,25 @@ def read_toml(file_path: str) -> dict:
             return tomllib.load(f)
     except Exception as e:
         raise TOMLReadError("Failed to read TOML file", file_path) from e
+
+
+def read_env(
+    dotenv_path: str | None = None,
+    stream: IO[str] | None = None,
+    verbose: bool = False,
+    override: bool = False,
+    interpolate: bool = True,
+    encoding: str | None = "utf-8",
+) -> bool:
+    """感谢python-dotenv库实现了非常成熟且高级的读取env的方法, mua~"""
+    return load_dotenv(
+        dotenv_path=dotenv_path,
+        stream=stream,
+        verbose=verbose,
+        override=override,
+        interpolate=interpolate,
+        encoding=encoding,
+    )
 
 
 def get_env_var(env_key: str) -> str:

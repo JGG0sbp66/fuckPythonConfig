@@ -4,9 +4,7 @@
 class ConfigReadError(Exception):
     """配置文件读取错误异常"""
 
-    def __init__(
-        self, message: str, file_path: str
-    ):
+    def __init__(self, message: str, file_path: str):
         self.message = message
         self.file_path = file_path
         super().__init__(self._format_message())

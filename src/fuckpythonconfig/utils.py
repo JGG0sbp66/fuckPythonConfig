@@ -5,10 +5,8 @@ import tomllib
 
 from .exceptions import FileNotFoundError, TOMLReadError
 
-ENV_VAR_REGEX = r"\$\{[^}]*\}"
 
-
-def is_env_var(value: str) -> bool:
+def is_env_var(value: str, ENV_VAR_REGEX: str = r"\$\{[^}]*\}") -> bool:
     """使用正则表达式判断是否为${value}格式"""
     return bool(re.fullmatch(ENV_VAR_REGEX, value))
 

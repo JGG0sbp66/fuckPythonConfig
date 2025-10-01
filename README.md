@@ -22,7 +22,7 @@
 
 环境要求：Python >= 3.11
 
-- 使用 pip（如果已发布到 PyPI）
+- 使用 pip
 
 ```cmd
 pip install fuckpythonconfig
@@ -34,7 +34,7 @@ pip install fuckpythonconfig
 uv add fuckpythonconfig
 ```
 
-- 从源码安装（尚未发布到 PyPI 时）
+- 从源码安装
 
 ```cmd
 pip install git+https://github.com/JGG0sbp66/fuckPythonConfig.git@dev
@@ -132,34 +132,15 @@ encoding: str | None = "utf-8",
 - TOMLReadError（TOML 语法或读取失败）
 - EnvVarNotFoundError（占位符对应的环境变量缺失且未提供默认值）
 
-### 常用辅助函数（可选使用）
-
-- read_toml(file_path: str) -> dict：读取 TOML 文件
-- get_env_var(env_key: str) -> str | None：读取环境变量
-- is_env_var(value: str) -> str | None：判断字符串是否为 "${...}" 并返回内部内容
-- resolve_config(config: dict) -> dict：对任意 dict/list 结构递归解析占位符
-- find_toml_path(current_dir: str) -> list[str]：列出目录下所有 .toml 路径（load_config 取第一个）
-- find_env_path(current_dir: str) -> list[str]：列出目录下所有 .env 路径（load_config 取第一个）
-
-自定义异常（位于 fuckpythonconfig.exceptions）：
-
-- ConfigReadError, FileNotFoundError, TOMLReadError, ENVReadError
-- EnvVarError, EnvVarNotFoundError
-
 ## 常见问题与限制
 
 - 仅替换“完全由占位符构成”的字符串，暂不支持在长字符串中进行部分替换
 - 当目录下存在多个 .toml/.env 时，load_config 会使用发现列表中的第一个（与文件系统枚举顺序相关）
-- Python 版本要求较新（>= 3.13），如需更低版本支持请提 Issue
+- Python 版本要求：>= 3.11（因内置 tomllib 从 3.11 起提供）
 
 ## 开发与贡献
 
-本仓库使用 Ruff 做格式与静态检查，根目录提供了 Windows 批处理脚本：
-
-```cmd
-scripts\lint.bat
-scripts\check-only.bat
-```
+本仓库使用 Ruff 做格式与静态检查
 
 建议使用 uv（或 venv）创建虚拟环境并安装依赖：
 
@@ -175,4 +156,4 @@ uv sync
 
 ## 许可
 
-尚未明确许可协议（License）。在你计划用于生产前，请先在 Issue 中与作者确认协议与使用边界。
+MIT License，详见仓库根目录的 `LICENSE` 文件。

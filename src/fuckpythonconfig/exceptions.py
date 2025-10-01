@@ -27,3 +27,21 @@ class TOMLReadError(ConfigReadError):
 
 class ENVReadError(ConfigReadError):
     pass
+
+class EnvVarError(Exception):
+    """环境变量错误异常"""
+
+    def __init__(self, message: str, env_key: str):
+        self.message = message
+        self.env_key = env_key
+        super().__init__(self._format_message())
+
+    def _format_message(self) -> str:
+        return f"{self.message} (env_key: {self.env_key})"
+
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
+        cls.__module__ = "builtins"
+
+class EnvVarNotFoundError(EnvVarError):
+    pass

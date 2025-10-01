@@ -7,7 +7,7 @@ requires-python = ">=3.11"
 authors = [
     { name = "JGG0sbp66" }
 ]
-license = { text = "MIT" }
+license = { file = "LICENSE" }
 keywords = ["config", "toml", "dotenv", "environment", "python"]
 classifiers = [
     "Programming Language :: Python :: 3",

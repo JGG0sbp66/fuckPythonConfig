@@ -1,5 +1,7 @@
 # fuckPythonConfig
 
+[![License: MIT](https://img.shields.io/github/license/JGG0sbp66/fuckPythonConfig)](./LICENSE) [![Python >= 3.11](https://img.shields.io/badge/Python-%3E%3D3.11-3776AB?logo=python&logoColor=white)](#installation) [![Ruff](https://img.shields.io/badge/Lint-Ruff-46A3FF)](https://docs.astral.sh/ruff/)
+
 English | [简体中文](./README.zh-CN.md)
 
 A zero-boilerplate config loader for Python. It auto-discovers a TOML config file and a .env file located next to your running script, then resolves placeholders like ${VAR} and ${VAR:default} recursively across dicts/lists. It uses python-dotenv under the hood for robust .env behavior.

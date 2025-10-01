@@ -1,5 +1,7 @@
 # fuckPythonConfig
 
+[![License: MIT](https://img.shields.io/github/license/JGG0sbp66/fuckPythonConfig)](./LICENSE) [![Python >= 3.11](https://img.shields.io/badge/Python-%3E%3D3.11-3776AB?logo=python&logoColor=white)](#安装) [![Ruff](https://img.shields.io/badge/Lint-Ruff-46A3FF)](https://docs.astral.sh/ruff/)
+
 [English](./README.md) | 简体中文
 
 一个“零样板”的 Python 配置加载器：在你的脚本同级目录自动查找 TOML 配置文件与 .env 文件，支持使用 ${VAR} 与 ${VAR:default} 占位符从环境变量填充配置，递归解析 dict/list，基于 python-dotenv 实现稳定的 .env 行为。

@@ -1,3 +1,9 @@
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+[tool.hatch.build.targets.wheel]
+# src 布局需要显式指定要打包的包路径
+packages = ["src/fuckpythonconfig"]
 [project]
 name = "fuckpythonconfig"
 version = "1.0.1"

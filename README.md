@@ -4,7 +4,6 @@
 
 > 目标：在小到中等规模的脚本/服务里，用一行 `load_config()` 即拿到可用配置，而不用再写一堆路径拼接与环境变量处理逻辑。
 
-
 ## 特性
 
 - 自动发现：无需传参，默认在“调用脚本所在目录”查找第一个 .toml 与 .env 文件
@@ -14,11 +13,10 @@
   - 递归解析 dict/list，保持结构不变
 - 与 .env 兼容：由 python-dotenv 提供解析/合并/覆盖等成熟行为
 - 明确的错误：
-	- 缺失文件：FileNotFoundError（自定义，信息更友好）
-	- 解析失败：TOMLReadError
-	- 环境变量缺失：EnvVarNotFoundError（当无默认值时抛出）
+  - 缺失文件：FileNotFoundError（自定义，信息更友好）
+    - 解析失败：TOMLReadError
+    - 环境变量缺失：EnvVarNotFoundError（当无默认值时抛出）
 - 纯标准库 + 小依赖：仅依赖 python-dotenv
-
 
 ## 安装
 
@@ -41,7 +39,6 @@ uv add fuckpythonconfig
 ```cmd
 pip install git+https://github.com/JGG0sbp66/fuckPythonConfig.git@dev
 ```
-
 
 ## 快速上手
 
@@ -94,7 +91,6 @@ cfg = load_config(
 )
 ```
 
-
 ## 占位符与解析规则
 
 - 语法：
@@ -108,10 +104,10 @@ cfg = load_config(
   - 其它非占位符的 TOML 值类型保持不变（int、bool、array 等）
 - 未找到变量：若无默认值，抛出 EnvVarNotFoundError
 
-
 ## API 参考
 
 ### load_config(
+
 file_path: str | None = None,
 dotenv_path: str | None = None,
 stream: IO[str] | None = None,
@@ -122,17 +118,19 @@ encoding: str | None = "utf-8",
 ) -> dict
 
 作用：
+
 - 读取 TOML → 加载 .env → 递归解析占位符 → 返回合并后的配置 dict
 
 行为细节：
+
 - 未显式传参时，会在“调用者脚本所在目录”中查找第一个 .toml 与 .env 文件
 - .env 加载由 python-dotenv 完成，上述参数透传对应能力
 
 可能抛出的异常：
+
 - FileNotFoundError（找不到 .toml/.env 或目录）
 - TOMLReadError（TOML 语法或读取失败）
 - EnvVarNotFoundError（占位符对应的环境变量缺失且未提供默认值）
-
 
 ### 常用辅助函数（可选使用）
 
@@ -144,16 +142,15 @@ encoding: str | None = "utf-8",
 - find_env_path(current_dir: str) -> list[str]：列出目录下所有 .env 路径（load_config 取第一个）
 
 自定义异常（位于 fuckpythonconfig.exceptions）：
+
 - ConfigReadError, FileNotFoundError, TOMLReadError, ENVReadError
 - EnvVarError, EnvVarNotFoundError
-
 
 ## 常见问题与限制
 
 - 仅替换“完全由占位符构成”的字符串，暂不支持在长字符串中进行部分替换
 - 当目录下存在多个 .toml/.env 时，load_config 会使用发现列表中的第一个（与文件系统枚举顺序相关）
 - Python 版本要求较新（>= 3.13），如需更低版本支持请提 Issue
-
 
 ## 开发与贡献
 
@@ -172,11 +169,9 @@ uv sync
 
 欢迎提交 Issue/PR 改进占位符能力（如局部替换、类型转换、跨文件引用等）。
 
-
 ## 致谢
 
 - python-dotenv 提供了强大稳定的 .env 加载能力
-
 
 ## 许可
 

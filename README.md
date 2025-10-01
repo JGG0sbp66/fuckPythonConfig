@@ -1,110 +1,112 @@
 # fuckPythonConfig
 
-一个“零样板”的 Python 配置加载器：在你的脚本同级目录自动查找 TOML 配置文件与 .env 文件，支持使用 ${VAR} 与 ${VAR:default} 占位符从环境变量填充配置，递归解析 dict/list，基于 python-dotenv 实现稳定的 .env 行为。
+English | [简体中文](./README.zh-CN.md)
 
-> 目标：在小到中等规模的脚本/服务里，用一行 `load_config()` 即拿到可用配置，而不用再写一堆路径拼接与环境变量处理逻辑。
+A zero-boilerplate config loader for Python. It auto-discovers a TOML config file and a .env file located next to your running script, then resolves placeholders like ${VAR} and ${VAR:default} recursively across dicts/lists. It uses python-dotenv under the hood for robust .env behavior.
 
-## 特性
+> Goal: in small-to-medium scripts/services, get a ready-to-use config with one call to `load_config()`, without writing path plumbing and env-var glue code.
 
-- 自动发现：无需传参，默认在“调用脚本所在目录”查找第一个 .toml 与 .env 文件
-- 占位符解析：
-  - ${VAR} 直接取环境变量
-  - ${VAR:default} 环境变量缺失时使用默认值
-  - 递归解析 dict/list，保持结构不变
-- 与 .env 兼容：由 python-dotenv 提供解析/合并/覆盖等成熟行为
-- 明确的错误：
-  - 缺失文件：FileNotFoundError（自定义，信息更友好）
-    - 解析失败：TOMLReadError
-    - 环境变量缺失：EnvVarNotFoundError（当无默认值时抛出）
-- 纯标准库 + 小依赖：仅依赖 python-dotenv
+## Features
 
-## 安装
+- Auto discovery: by default, finds the first .toml and .env next to the caller script
+- Placeholder resolution:
+  - ${VAR} uses the environment variable
+  - ${VAR:default} uses default when the variable is missing
+  - Recursively resolves across dicts/lists
+- .env compatibility: powered by python-dotenv (merge/override/interpolate, etc.)
+- Clear errors:
+  - FileNotFoundError (custom, more friendly info)
+  - TOMLReadError
+  - EnvVarNotFoundError (when no default provided)
+- Minimal deps: only python-dotenv (plus stdlib tomllib)
 
-环境要求：Python >= 3.11
+## Installation
 
-- 使用 pip
+Requires: Python >= 3.11
+
+- pip
 
 ```cmd
 pip install fuckpythonconfig
 ```
 
-- 使用 uv（可选）
+- uv (optional)
 
 ```cmd
 uv add fuckpythonconfig
 ```
 
-- 从源码安装
+- from source
 
 ```cmd
 pip install git+https://github.com/JGG0sbp66/fuckPythonConfig.git@dev
 ```
 
-## 快速上手
+## Quick Start
 
-目录结构（示例）：
+Project layout (example):
 
 ```text
 your-project/
-  app.py           # 你的脚本（调用 load_config()）
-  config.toml      # 配置文件
-  .env             # 环境变量（开发环境）
+  app.py           # your script calling load_config()
+  config.toml      # config file
+  .env             # environment variables (dev)
 ```
 
-config.toml：
+config.toml:
 
 ```toml
 [database]
 host = "127.0.0.1"
 port = 5432
 username = "${DB_USER:postgres}"
-password = "${DB_PASS}"  # 无默认值，未设置时将抛出 EnvVarNotFoundError
+password = "${DB_PASS}"  # will raise EnvVarNotFoundError if missing
 ```
 
-.env：
+.env:
 
 ```dotenv
 DB_USER=local_user
 DB_PASS=secret123
 ```
 
-app.py：
+app.py:
 
 ```python
-from fuckpythonconfig import load_config  # 0.1.0 起可直接这样导入
+from fuckpythonconfig import load_config
 
-cfg = load_config()  # 不传参时，自动在 app.py 同级目录查找 .toml 与 .env
+cfg = load_config()  # auto-discovers .toml and .env next to app.py
 print(cfg["database"]["username"])  # => "local_user"
 ```
 
-显式传参（可选）：
+Explicit parameters (optional):
 
 ```python
 from fuckpythonconfig import load_config
 
 cfg = load_config(
-    file_path="./config.toml",   # 指定 TOML 路径
-    dotenv_path="./.env",        # 指定 .env 路径
-    verbose=True,                 # 透传给 python-dotenv，打印更多加载信息
-    override=False,               # 是否覆盖已有环境变量
-    interpolate=True,             # 是否允许 .env 中的变量插值
+    file_path="./config.toml",   # specify TOML path
+    dotenv_path="./.env",        # specify .env path
+    verbose=True,                 # passthrough to python-dotenv
+    override=False,               # override existing env vars
+    interpolate=True,             # allow .env interpolation
 )
 ```
 
-## 占位符与解析规则
+## Placeholder rules
 
-- 语法：
-  - ${VAR} → 使用环境变量 VAR 的值
-  - ${VAR:default} → 当 VAR 未设置时使用 default 字面量
-- 作用域：递归应用于 dict 和 list 中的所有字符串值
-- 匹配方式：仅当值“完全等于”占位符格式时才会替换
-  - 即 "${VAR}" 可替换；而 "prefix ${VAR}" 或 "${VAR} suffix" 不会替换（当前版本的限制）
-- 类型：
-  - 被替换的值为字符串（来自环境变量或默认值）
-  - 其它非占位符的 TOML 值类型保持不变（int、bool、array 等）
-- 未找到变量：若无默认值，抛出 EnvVarNotFoundError
+- Syntax:
+  - ${VAR} → use env var VAR
+  - ${VAR:default} → use default literal if VAR is missing
+- Scope: recursively applied to all string values in dict/list
+- Match: only replaced when a value is exactly a placeholder
+  - i.e. "${VAR}" is replaced; "prefix ${VAR}" is not (current limitation)
+- Types:
+  - replaced value is a string (from env/default)
+  - non-placeholder TOML types remain unchanged (int/bool/array, etc.)
+- Missing variable: raises EnvVarNotFoundError if no default provided
 
-## API 参考
+## API
 
 ### load_config(
 
@@ -117,43 +119,41 @@ interpolate: bool = True,
 encoding: str | None = "utf-8",
 ) -> dict
 
-作用：
+Purpose:
 
-- 读取 TOML → 加载 .env → 递归解析占位符 → 返回合并后的配置 dict
+- Read TOML → load .env → resolve placeholders → return a merged dict
 
-行为细节：
+Details:
 
-- 未显式传参时，会在“调用者脚本所在目录”中查找第一个 .toml 与 .env 文件
-- .env 加载由 python-dotenv 完成，上述参数透传对应能力
+- When not specified, it searches the caller script directory for the first .toml and .env
+- .env loading is handled by python-dotenv; parameters are passed through
 
-可能抛出的异常：
+Exceptions:
 
-- FileNotFoundError（找不到 .toml/.env 或目录）
-- TOMLReadError（TOML 语法或读取失败）
-- EnvVarNotFoundError（占位符对应的环境变量缺失且未提供默认值）
+- FileNotFoundError (missing .toml/.env/dir)
+- TOMLReadError (syntax or read failure)
+- EnvVarNotFoundError (placeholder var missing without default)
 
-## 常见问题与限制
+## Limitations
 
-- 仅替换“完全由占位符构成”的字符串，暂不支持在长字符串中进行部分替换
-- 当目录下存在多个 .toml/.env 时，load_config 会使用发现列表中的第一个（与文件系统枚举顺序相关）
-- Python 版本要求：>= 3.11（因内置 tomllib 从 3.11 起提供）
+- Only replaces values that are exactly a placeholder (no partial replacement in long strings)
+- If multiple .toml/.env files exist, the first one enumerated by the filesystem is used
+- Python >= 3.11 (due to stdlib tomllib)
 
-## 开发与贡献
+## Development
 
-本仓库使用 Ruff 做格式与静态检查
-
-建议使用 uv（或 venv）创建虚拟环境并安装依赖：
+Ruff is used for linting/formatting.
 
 ```cmd
 uv sync
 ```
 
-欢迎提交 Issue/PR 改进占位符能力（如局部替换、类型转换、跨文件引用等）。
+Contributions are welcome (placeholder improvements, type casting, cross-file refs, etc.).
 
-## 致谢
+## Acknowledgments
 
-- python-dotenv 提供了强大稳定的 .env 加载能力
+- python-dotenv for the robust .env handling
 
-## 许可
+## License
 
-MIT License，详见仓库根目录的 `LICENSE` 文件。
+MIT License. See `LICENSE` for details.

@@ -94,4 +94,6 @@ def find_toml_path(current_dir: str) -> list[str]:
         if file.endswith('.toml'):
             toml_files.append(os.path.join(current_dir, file))
 
+    if toml_files == []:
+        raise FileNotFoundError("No TOML file found in directory", current_dir)
     return toml_files

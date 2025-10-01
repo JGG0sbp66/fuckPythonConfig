@@ -34,18 +34,6 @@ def get_env_var(env_key: str) -> str | None:
 def resolve_config(config: dict) -> dict:
     """递归解析配置中的占位符"""
 
-    def _convert_value(value: str):
-        """类型转换"""
-        if value.lower() in {"true", "false"}:
-            return value.lower() == "true"
-        try:
-            return int(value)
-        except ValueError:
-            try:
-                return float(value)
-            except ValueError:
-                return value
-
     def _parse_env_spec(env_spec: str) -> tuple[str, str | None]:
         """解析环境变量规格: ${VAR:default} -> (VAR, default)"""
         content = env_spec.strip()
@@ -68,9 +56,7 @@ def resolve_config(config: dict) -> dict:
                     else:
                         raise EnvVarNotFoundError("Environment variable not found", var_name)
 
-                # 类型转换
-                # TODO: 目前存在一个bug, 当默认值是字符串时, 会被转换成非字符串类型
-                return _convert_value(env_value)
+                return env_value
             return value
 
         elif isinstance(value, dict):

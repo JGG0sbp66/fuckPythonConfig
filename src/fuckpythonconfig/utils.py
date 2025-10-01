@@ -80,3 +80,18 @@ def resolve_config(config: dict) -> dict:
             return value
 
     return _resolve(config)
+
+def find_toml_path(current_dir: str) -> list[str]:
+    """查找当前目录下的toml文件, 返回toml路径列表"""
+    if not os.path.exists(current_dir):
+        raise FileNotFoundError("Directory not found", current_dir)
+
+    if not os.path.isdir(current_dir):
+        raise ValueError(f"Path is not a directory: {current_dir}")
+
+    toml_files = []
+    for file in os.listdir(current_dir):
+        if file.endswith('.toml'):
+            toml_files.append(os.path.join(current_dir, file))
+
+    return toml_files

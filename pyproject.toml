@@ -1,9 +1,26 @@
 [project]
 name = "fuckpythonconfig"
 version = "0.1.0"
-description = "Add your description here"
+description = "Zero-boilerplate config loader: auto-discover TOML & .env, resolve ${VAR} and ${VAR:default}."
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.11"
+authors = [
+    { name = "JGG0sbp66" }
+]
+license = { file = "LICENSE" }
+keywords = ["config", "toml", "dotenv", "environment", "python"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Libraries",
+    "Operating System :: OS Independent",
+    "License :: OSI Approved :: MIT License",
+]
+urls = { homepage = "https://github.com/JGG0sbp66/fuckPythonConfig" }
 dependencies = [
     "python-dotenv>=1.1.1",
 ]
@@ -12,7 +29,7 @@ dependencies = [
 # 设置行长度限制
 line-length = 88
 # 设置目标 Python 版本
-target-version = "py313"
+target-version = "py311"
 # 指定要检查的文件和目录
 include = ["src/**/*.py"]
 exclude = [

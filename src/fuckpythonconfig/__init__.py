@@ -1,1 +1,7 @@
-# TODO: 计划在这里导出各种属性
+"""fuckpythonconfig public API."""
+
+from .core import load_config
+
+__all__ = [
+    "load_config",
+]

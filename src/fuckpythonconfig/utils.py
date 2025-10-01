@@ -18,7 +18,7 @@ def read_toml(file_path: str) -> dict:
         raise TOMLReadError("Failed to read TOML file", file_path) from e
 
 
-def is_env_var(value: str, ENV_VAR_REGEX: str = r"\$\{[^}]*\}") -> str | None:
+def is_env_var(value: str, ENV_VAR_REGEX: str = r"\$\{([^}]*)\}") -> str | None:
     """使用正则表达式判断是否为${value}格式"""
     match = re.fullmatch(ENV_VAR_REGEX, value)
     if match:
@@ -26,9 +26,9 @@ def is_env_var(value: str, ENV_VAR_REGEX: str = r"\$\{[^}]*\}") -> str | None:
     return None
 
 
-def get_env_var(env_key: str) -> str:
+def get_env_var(env_key: str) -> str | None:
     """使用os读取环境变量"""
-    return os.getenv(env_key, "")
+    return os.getenv(env_key, None)
 
 
 def resolve_config(config: dict) -> dict:
@@ -48,7 +48,7 @@ def resolve_config(config: dict) -> dict:
 
     def _parse_env_spec(env_spec: str) -> tuple[str, str | None]:
         """解析环境变量规格: ${VAR:default} -> (VAR, default)"""
-        content = env_spec.strip('${}').strip()
+        content = env_spec.strip()
         if ':' in content:
             var_name, default_val = content.split(':', 1)
             return var_name.strip(), default_val.strip()
@@ -81,6 +81,7 @@ def resolve_config(config: dict) -> dict:
 
     return _resolve(config)
 
+
 def find_toml_path(current_dir: str) -> list[str]:
     """查找当前目录下的toml文件, 返回toml路径列表"""
     if not os.path.exists(current_dir):
@@ -97,3 +98,21 @@ def find_toml_path(current_dir: str) -> list[str]:
     if toml_files == []:
         raise FileNotFoundError("No TOML file found in directory", current_dir)
     return toml_files
+
+
+def find_env_path(current_dir: str) -> list[str]:
+    """查找当前目录下的env文件, 返回env路径列表"""
+    if not os.path.exists(current_dir):
+        raise FileNotFoundError("Directory not found", current_dir)
+
+    if not os.path.isdir(current_dir):
+        raise ValueError(f"Path is not a directory: {current_dir}")
+
+    env_files = []
+    for file in os.listdir(current_dir):
+        if file.endswith('.env'):
+            env_files.append(os.path.join(current_dir, file))
+
+    if env_files == []:
+        raise FileNotFoundError("No .env file found in directory", current_dir)
+    return env_files

@@ -2,11 +2,9 @@
 import os
 import re
 import tomllib
-from typing import IO
+from typing import Any
 
-from dotenv import load_dotenv
-
-from .exceptions import FileNotFoundError, TOMLReadError
+from .exceptions import EnvVarNotFoundError, FileNotFoundError, TOMLReadError
 
 
 def read_toml(file_path: str) -> dict:
@@ -20,30 +18,65 @@ def read_toml(file_path: str) -> dict:
         raise TOMLReadError("Failed to read TOML file", file_path) from e
 
 
-def read_env(
-    dotenv_path: str | None = None,
-    stream: IO[str] | None = None,
-    verbose: bool = False,
-    override: bool = False,
-    interpolate: bool = True,
-    encoding: str | None = "utf-8",
-) -> bool:
-    """感谢python-dotenv库实现了非常成熟且高级的读取env的方法, mua~"""
-    return load_dotenv(
-        dotenv_path=dotenv_path,
-        stream=stream,
-        verbose=verbose,
-        override=override,
-        interpolate=interpolate,
-        encoding=encoding,
-    )
-
-
-def is_env_var(value: str, ENV_VAR_REGEX: str = r"\$\{[^}]*\}") -> bool:
+def is_env_var(value: str, ENV_VAR_REGEX: str = r"\$\{[^}]*\}") -> str | None:
     """使用正则表达式判断是否为${value}格式"""
-    return bool(re.fullmatch(ENV_VAR_REGEX, value))
+    match = re.fullmatch(ENV_VAR_REGEX, value)
+    if match:
+        return match.group(1)
+    return None
 
 
 def get_env_var(env_key: str) -> str:
     """使用os读取环境变量"""
     return os.getenv(env_key, "")
+
+
+def resolve_config(config: dict) -> dict:
+    """递归解析配置中的占位符"""
+
+    def _convert_value(value: str):
+        """类型转换"""
+        if value.lower() in {"true", "false"}:
+            return value.lower() == "true"
+        try:
+            return int(value)
+        except ValueError:
+            try:
+                return float(value)
+            except ValueError:
+                return value
+
+    def _parse_env_spec(env_spec: str) -> tuple[str, str | None]:
+        """解析环境变量规格: ${VAR:default} -> (VAR, default)"""
+        content = env_spec.strip('${}').strip()
+        if ':' in content:
+            var_name, default_val = content.split(':', 1)
+            return var_name.strip(), default_val.strip()
+        return content, None
+
+    def _resolve(value: Any) -> Any:
+        if isinstance(value, str):
+            env_key = is_env_var(value)
+            if env_key:
+                var_name, default_val = _parse_env_spec(env_key)
+                env_value = get_env_var(var_name)
+
+                # 如果环境变量不存在, 使用默认值
+                if env_value is None:
+                    if default_val is not None:
+                        env_value = default_val
+                    else:
+                        raise EnvVarNotFoundError("Environment variable not found", var_name)
+
+                # 类型转换
+                return _convert_value(env_value)
+            return value
+
+        elif isinstance(value, dict):
+            return {k: _resolve(v) for k, v in value.items()}
+        elif isinstance(value, list):
+            return [_resolve(item) for item in value]
+        else:
+            return value
+
+    return _resolve(config)

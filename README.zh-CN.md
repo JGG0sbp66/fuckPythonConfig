@@ -1,6 +1,6 @@
 # fuckPythonConfig
 
-[![License: MIT](https://img.shields.io/github/license/JGG0sbp66/fuckPythonConfig)](./LICENSE) [![Python >= 3.11](https://img.shields.io/badge/Python-%3E%3D3.11-3776AB?logo=python&logoColor=white)](#安装) [![Ruff](https://img.shields.io/badge/Lint-Ruff-46A3FF)](https://docs.astral.sh/ruff/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](./LICENSE) [![Python >= 3.11](https://img.shields.io/badge/Python-%3E%3D3.11-3776AB?logo=python&logoColor=white)](#安装) [![Ruff](https://img.shields.io/badge/Lint-Ruff-46A3FF)](https://docs.astral.sh/ruff/)
 
 [English](./README.md) | 简体中文
 

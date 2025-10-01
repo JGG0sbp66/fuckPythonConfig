@@ -69,6 +69,7 @@ def resolve_config(config: dict) -> dict:
                         raise EnvVarNotFoundError("Environment variable not found", var_name)
 
                 # 类型转换
+                # TODO: 目前存在一个bug, 当默认值是字符串时, 会被转换成非字符串类型
                 return _convert_value(env_value)
             return value
 
